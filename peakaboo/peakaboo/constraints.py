@@ -6,7 +6,7 @@ import sys, itertools
 import emcee
 import os
 
-local=1
+local=0
 tightball = 0
 add_2dpdf = 0
 plot_only = 0
@@ -59,7 +59,7 @@ if single_z:
     like_dir='/scratch/02977/jialiu/peakaboo/likelihood_z1/'
     stats_dir = '/scratch/02977/jialiu/peakaboo/stats_z1/'
 
-ebcov_dir = stats_dir
+ebcov_dir = stats_dir+'Om0.29997_As2.10000_mva0.00000_mvb0.00000_mvc0.00000_h0.70000_Ode0.69995/1024b512/box5/output_eb_5000_s4/seed0/'
 
 Nz = len(z_arr)
 
@@ -75,7 +75,7 @@ if local:
     
 eb_dir = stats_dir+'stats_avg/output_eb_5000_s4/'
 #eb1k_dir = stats_dir+'stats_avg_1k/output_eb_5000_s4/'
-+'Om0.29997_As2.10000_mva0.00000_mvb0.00000_mvc0.00000_h0.70000_Ode0.69995/1024b512/box5/output_eb_5000_s4/seed0/'
+#
 params = genfromtxt(peakaboo_dir+'cosmo_params_all.txt',usecols=[2,3,4])
 
 #####################################
@@ -214,19 +214,20 @@ if test_cross:
     emulators = [WLanalysis.buildInterpolator(array(istats)[1:], params[1:], function='GP') 
                 for istats in [psIauto_flat,  psIcross_flat, psI_flat]]
     
-#else:
-    #obss = [psIauto_flat[1], pdf1dN_flat[1], comb_auto_flat[1]]
-    #covIs = [covIpsNauto, covIpdf1dN, covIcomb_auto]
+else:
+    obss = [psIauto_flat[1], pdf1dN_flat[1], comb_auto_flat[1]]
+    covIs = [covIpsNauto, covIpdf1dN, covIcomb_auto]
 
-    #emusingle = [WLanalysis.buildInterpolator(array(istats)[1:], params[1:], function='GP') 
-                #for istats in [psIauto_flat,  pdf1dN_flat]] #comb_auto_flat,comb_cros_flat]]
-    #emucomb_auto = lambda p: concatenate([emusingle[0](p),emusingle[1](p)])
-    #emulators= emusingle+[emucomb_auto,]
+    emusingle = [WLanalysis.buildInterpolator(array(istats)[1:], params[1:], function='GP') 
+                for istats in [psIauto_flat,  pdf1dN_flat]] #comb_auto_flat,comb_cros_flat]]
+    emucomb_auto = lambda p: concatenate([emusingle[0](p),emusingle[1](p)])
+    emulators= emusingle+[emucomb_auto,]
 
 if add_2dpdf:
     obss += [pdf2dN_flat,]
     covIs +=[covIpdf2dN,]
     emulators += [WLanalysis.buildInterpolator(array(pdf2dN_flat)[1:], params[1:], function='GP'),]
+
 #emulators = [WLanalysis.buildInterpolator(array(istats)[1:], params[1:], function='GP') 
             #for istats in [psIauto_flat, pdf1dN_flat, comb_auto_flat]]
 
