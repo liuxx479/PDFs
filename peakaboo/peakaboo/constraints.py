@@ -14,10 +14,11 @@ single_z = 0
 test_cross = 0
 very_wide = 0
 upload_dropbox = 1
-upload_MCMC=0
+upload_MCMC=1
+bloc_cov = 0
 
 Nk='10k' # '5ka', '5kb'
-Nmin=500 ###### minimum counts in that bin to get included in PDF calculation
+Nmin=1000 #500###### minimum counts in that bin to get included in PDF calculation
 Nmin2=20
 Nchain = 1000
 iscale = 1 ## rescale the PDF so it has similar magnitude as the power spectrum
@@ -36,7 +37,7 @@ except Exception:
 collapse=''#'collapsed'#
 np.random.seed(10026)#
 
-testfn = collapse+'Feb1_%s_fullcov_%s_Nchain%i_%s'%(['tomo','z1'][single_z],['wideP0','tightball'][tightball],Nchain,Nk)#''#
+testfn = collapse+'Mar6_%s_ell600_%s_Nchain%i_%s_Nmin%i'%(['tomo','z1'][single_z],['wideP0','tightball'][tightball],Nchain,Nk,Nmin)#''#
 
 if very_wide:
     testfn = collapse+'Sep5_%s_fullcov_%s_Nchain%i_%s'%(['tomo','z1'][single_z],['verywideP0','tightball'][tightball],Nchain,Nk)#''#
@@ -78,8 +79,8 @@ if local:
 eb_dir = stats_dir+'stats_avg/output_eb_5000_s4/'
 #eb1k_dir = stats_dir+'stats_avg_1k/output_eb_5000_s4/'
 #
-params = genfromtxt(peakaboo_dir+'cosmo_params_all.txt',usecols=[2,3,4])
 
+params = genfromtxt(peakaboo_dir+'cosmo_params_all.txt',usecols=[2,3,4])
 #####################################
 ##### initiate avg statistics #######
 #####################################
@@ -239,12 +240,18 @@ rDH = [ float((1e4-len(covI)-2.0)/9999.0) for covI in covIs] ##
 ############# likelihood #######
 from scipy.misc import factorial
 
+
 def lnprob_gaussian(p,jjj):
     '''log likelihood '''
     if p[0]<0: ####### force neutrino mass to be positive
         return -np.inf
     diff = emulators[jjj](p)-obss[jjj]
     return float(-0.5*mat(diff)*covIs[jjj]*mat(diff).T)*rDH[jjj]
+
+def lnprob_block(p,jjj=0):
+    '''block likelihood 
+    '''
+    return lnprob_gaussian(p,0)+lnprob_gaussian(p,1)
 
 def lnprob_poisson(p,jjj=1):
     if p[0]<0: ####### force neutrino mass to be positive
@@ -253,10 +260,6 @@ def lnprob_poisson(p,jjj=1):
     n = obss[jjj]
     return sum(n*log(mu)-mu-log(factorial(n)))
 
-def lnprob_sanity(p,jjj=0):
-    '''log likelihood of 
-    '''
-    return lnprob_gaussian(p,0)+lnprob_poisson(p,1)
 
 lnprob = lnprob_gaussian
 
@@ -316,6 +319,8 @@ if not plot_only:
         save(ifn, sampler.flatchain)
 
     i=2
+    if bloc_cov:
+        lnprob = lnprob_block
     print fn_arr[i], obss[i].shape
     ifn = like_dir+'MC_%s_%s.npy'%(fn_arr[i],testfn)
     if not os.path.isfile(ifn):
@@ -370,7 +375,7 @@ def plotmc(chain, f=None, icolor='k',range=[[-0.1,0.5],[0.27,0.33],[1.7,2.7]]):
     chain = chain[len(chain)/3:]
     corner.corner(chain, labels=[r"$M_\nu$", r"$\Omega_m$", r"$A_s$"],
                   levels=[0.95,],color=icolor,
-                  range=range,truths=fidu_params, fig=f, 
+                   range=range,truths=fidu_params, fig=f, 
                   plot_datapoints=0, plot_density=0,
                   truth_color="k",fill_contours=0)#0.67,
 
