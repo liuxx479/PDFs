@@ -8,7 +8,7 @@ from astropy.io import fits
 import scipy.ndimage as snd
 
 #zidx=int(sys.argv([1])) ### index for redshift, go from 0 to 5
-imnu, izidx = int(sys.argv([1])), int(sys.argv([2]))
+imnu, izidx = int(sys.argv[1]), int(sys.argv[2])
 
 smooth = lambda kmap, sigma: snd.filters.gaussian_filter(kmap.astype(float),sigma,mode='constant')
 
