@@ -16,7 +16,9 @@ out_dir = '/tigress/jialiu/PDFs/cora/'
 
 mapgen = lambda z, r, mnu: fits.open(map_dir+'convergence_6redshifts_mnv0.%i0000_om0.30000_As2.1000/Maps%02d/WLconv_z%.2f_%04dr.fits'%(mnu, z*10, z, r))[0].data ## mnu=1 or 0
 
-thetaG_arr = array([5, 10, 15]) * 512./(3.5*60) #arcmin * pix_per_arcmin
+thetaG_arcmin = array([5, 10, 15]) #arcmin * pix_per_arcmin
+
+thetaG_arr = thetaG_arcmin * 512./(3.5*60) #arcmin * pix_per_arcmin
 
 z_arr = concatenate([arange(0.5, 3, 0.5),[1100.,]])
 #sigmakappa_arr = array([ [std(smooth(mapgen(iz, 1, 0), thetaG)) 
@@ -53,7 +55,7 @@ print 'Mnu, z:', imnu, z_arr[izidx]
 out = array(pool.map(smooth_map, range(1,1001)))
 
 for j in range(len(thetaG_arr)):
-    save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arr[j]), out[:,j,:])
+    save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arcmin[j]), out[:,j,:])
 
 pool.close()
 
