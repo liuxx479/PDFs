@@ -34,7 +34,7 @@ binedges_fun = lambda sigmak: np.linspace(-5*sigmak, 5*sigmak, 101)
 binedges = array([map(binedges_fun,isigmakappa_arr) for isigmakappa_arr in sigmakappa_arr])
 
 #### smooth function, for all smoothing bins
-def smooth_map (r, mnu=0, zidx=zidx):
+def smooth_map (r, mnu=0, zidx=0):
     imap = mapgen(z_arr[zidx], r, mnu)
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
