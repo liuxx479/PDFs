@@ -8,6 +8,7 @@ from astropy.io import fits
 import scipy.ndimage as snd
 
 #zidx=int(sys.argv([1])) ### index for redshift, go from 0 to 5
+imnu, izidx = int(sys.argv([1])), int(sys.argv([2]))
 
 smooth = lambda kmap, sigma: snd.filters.gaussian_filter(kmap.astype(float),sigma,mode='constant')
 
@@ -36,7 +37,7 @@ binedges_fun = lambda sigmak: np.linspace(-5*sigmak, 5*sigmak, 101)
 binedges = array([map(binedges_fun,isigmakappa_arr) for isigmakappa_arr in sigmakappa_arr])
 
 #### smooth function, for all smoothing bins
-def smooth_map (r, mnu=0, zidx=0):
+def smooth_map (r, mnu=imnu, zidx=izidx):
     imap = mapgen(z_arr[zidx], r, mnu)
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
@@ -48,12 +49,8 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
-#for imnu in (0,1):
-    #for izidx in range(6):
-imnu, izidx = 0, 0
 print 'Mnu, z:', imnu, z_arr[izidx]
-out = array(pool.map(smooth_map, range(1,1001)))
-
+out = array(pool.map(smooth_map, range(1,10001)))
 for j in range(len(thetaG_arr)):
     save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arcmin[j]), out[:,j,:])
 
