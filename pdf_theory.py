@@ -41,11 +41,10 @@ def smooth_map (r, mnu=0, zidx=zidx):
                       for i in range(len(thetaG_arr))])
     return hist_arr
     
-if not plot_only:
-    pool=MPIPool()
-    if not pool.is_master():
-        pool.wait()
-        sys.exit(0)
+pool=MPIPool()
+if not pool.is_master():
+    pool.wait()
+    sys.exit(0)
 
 for imnu in (0,1):
     for izidx in range(6):
