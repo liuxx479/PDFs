@@ -58,3 +58,5 @@ pool.close()
 
 #out_massless = array(pool.map(lambda p: smooth_map(p, mnu=1), range(1,10000)))
 ### output shape=(9999, 3, 100) for 9999 realizations, 3 smoothing scale, 100 bins
+
+print 'DONE DONE DONE'
