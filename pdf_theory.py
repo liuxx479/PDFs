@@ -46,12 +46,13 @@ if not pool.is_master():
     pool.wait()
     sys.exit(0)
 
-for imnu in (0,1):
-    for izidx in range(6):
-        print 'Mnu, z:', imnu, z_arr[izidx]
-        out = array(pool.map(lambda p: smooth_map(p, mnu=imnu, zidx=izidx), range(1,1001)))
-        for j in range(len(thetaG_arr)):
-            save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arr[j]), out[:,j,:])
+#for imnu in (0,1):
+    #for izidx in range(6):
+imnu, izidx = 0, 0
+print 'Mnu, z:', imnu, z_arr[izidx]
+out = array(pool.map(lambda p: smooth_map(p, mnu=imnu, zidx=izidx), range(1,1001)))
+for j in range(len(thetaG_arr)):
+    save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arr[j]), out[:,j,:])
 
 pool.close()
 
