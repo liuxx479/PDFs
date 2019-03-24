@@ -51,6 +51,7 @@ if not pool.is_master():
 imnu, izidx = 0, 0
 print 'Mnu, z:', imnu, z_arr[izidx]
 out = array(pool.map(smooth_map, range(1,1001)))
+
 for j in range(len(thetaG_arr)):
     save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arr[j]), out[:,j,:])
 
