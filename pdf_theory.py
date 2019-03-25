@@ -7,7 +7,7 @@ import os
 from astropy.io import fits
 import scipy.ndimage as snd
 
-#zidx=int(sys.argv([1])) ### index for redshift, go from 0 to 5
+#zidx=int(sys.argv([1])) ### izidx index for redshift, go from 0 to 5
 imnu, izidx = int(sys.argv[1]), int(sys.argv[2])
 
 smooth = lambda kmap, sigma: snd.filters.gaussian_filter(kmap.astype(float),sigma,mode='constant')
@@ -22,15 +22,30 @@ thetaG_arcmin = array([5, 10, 15]) #arcmin * pix_per_arcmin
 thetaG_arr = thetaG_arcmin * 512./(3.5*60) #arcmin * pix_per_arcmin
 
 z_arr = concatenate([arange(0.5, 3, 0.5),[1100.,]])
-#sigmakappa_arr = array([ [std(smooth(mapgen(iz, 1, 0), thetaG)) 
-                  #for thetaG in thetaG_arr] for iz in z_arr])
+sigmakappa_arr = array([ [std(smooth(mapgen(iz, 1, 0), thetaG)) 
+                  for thetaG in thetaG_arr] for iz in z_arr])
 
-sigmakappa_arr = array([[ 0.00320448,  0.0022913 ,  0.00168369],
-                        [ 0.0051601 ,  0.00390173,  0.00299778],
-                        [ 0.00667598,  0.00507506,  0.0039651 ],
-                        [ 0.00764257,  0.00567065,  0.00433421],
-                        [ 0.00856384,  0.00624893,  0.0046596 ],
-                        [ 0.01968398,  0.01379884,  0.00995027]])
+sigmakappa_arr_massive = array([[ 0.00459626,  0.00308772,  0.00220381],
+       [ 0.00708774,  0.00497572,  0.003762  ],
+       [ 0.00927037,  0.00648126,  0.00492705],
+       [ 0.01086472,  0.00743865,  0.00551859],
+       [ 0.01226901,  0.00834649,  0.00608883],
+       [ 0.03019188,  0.01931345,  0.01356282]])
+
+
+sigmakappa_arr = array([[ 0.0047579 ,  0.00320448,  0.0022913 ],
+       [ 0.00734598,  0.0051601 ,  0.00390173],
+       [ 0.00954841,  0.00667598,  0.00507506],
+       [ 0.01116931,  0.00764257,  0.00567065],
+       [ 0.01260201,  0.00856384,  0.00624893],
+       [ 0.03081554,  0.01968398,  0.01379884]])
+
+#sigmakappa_arr = array([[ 0.00320448,  0.0022913 ,  0.00168369],
+                        #[ 0.0051601 ,  0.00390173,  0.00299778],
+                        #[ 0.00667598,  0.00507506,  0.0039651 ],
+                        #[ 0.00764257,  0.00567065,  0.00433421],
+                        #[ 0.00856384,  0.00624893,  0.0046596 ],
+                        #[ 0.01968398,  0.01379884,  0.00995027]])
 
 ##### pre-defined bin edges, 100 linear bins between -5, 5 sigma_kappa
 binedges_fun = lambda sigmak: np.linspace(-5*sigmak, 5*sigmak, 101)
