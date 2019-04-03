@@ -22,8 +22,8 @@ thetaG_arcmin = array([5, 10, 15]) #arcmin * pix_per_arcmin
 thetaG_arr = thetaG_arcmin * 512./(3.5*60) #arcmin * pix_per_arcmin
 
 z_arr = concatenate([arange(0.5, 3, 0.5),[1100.,]])
-sigmakappa_arr = array([ [std(smooth(mapgen(iz, 1, 0), thetaG)) 
-                  for thetaG in thetaG_arr] for iz in z_arr])
+sigmakappa_arr = array([ [std(smooth(mapgen(iz, 5, 0), thetaG).flatten()) 
+                 for thetaG in thetaG_arr] for iz in z_arr])
 
 sigmakappa_arr_massive = array([[ 0.00459626,  0.00308772,  0.00220381],
        [ 0.00708774,  0.00497572,  0.003762  ],
@@ -40,12 +40,14 @@ sigmakappa_arr = array([[ 0.0047579 ,  0.00320448,  0.0022913 ],
        [ 0.01260201,  0.00856384,  0.00624893],
        [ 0.03081554,  0.01968398,  0.01379884]])
 
-#sigmakappa_arr = array([[ 0.00320448,  0.0022913 ,  0.00168369],
-                        #[ 0.0051601 ,  0.00390173,  0.00299778],
-                        #[ 0.00667598,  0.00507506,  0.0039651 ],
-                        #[ 0.00764257,  0.00567065,  0.00433421],
-                        #[ 0.00856384,  0.00624893,  0.0046596 ],
-                        #[ 0.01968398,  0.01379884,  0.00995027]])
+correct_ratio = array([[0.78637631, 0.86309699, 0.98560815],
+       [0.97673189, 1.01999364, 1.09682727],
+       [1.0377963 , 1.08292562, 1.15041094],
+       [1.08185203, 1.14821166, 1.24154902],
+       [1.0987346 , 1.16937103, 1.27900662],
+       [1.16195681, 1.24064477, 1.34414003]])
+
+sigmakappa_arr*=correct_ratio
 
 ##### pre-defined bin edges, 100 linear bins between -5, 5 sigma_kappa
 binedges_fun = lambda sigmak: np.linspace(-5*sigmak, 5*sigmak, 101)
@@ -57,7 +59,7 @@ def smooth_map (r, mnu=imnu, zidx=izidx):
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
                       for i in range(len(thetaG_arr))])
-    return hist_arr
+    return hist_arr, std(imap_smooth)
     
 pool=MPIPool()
 if not pool.is_master():
@@ -65,9 +67,12 @@ if not pool.is_master():
     sys.exit(0)
 
 print 'Mnu, z:', imnu, z_arr[izidx]
-out = array(pool.map(smooth_map, range(1,10001)))
+out_all = array(pool.map(smooth_map, range(1,10001)))
+out = array([out_all[i,0] for i in range(len(out_all))])
+out_std = array([out_all[i,1] for i in range(len(out_all))])
 for j in range(len(thetaG_arr)):
     save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arcmin[j]), out[:,j,:])
+save(out_dir+'PDFs_Mnu0.%i_z%.1f.npy'%(imnu, z_arr[izidx]), out_std)
 
 pool.close()
 
