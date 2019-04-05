@@ -40,7 +40,7 @@ sigmakappa_arr = array([[ 0.0047579 ,  0.00320448,  0.0022913 ],
        [ 0.01260201,  0.00856384,  0.00624893],
        [ 0.03081554,  0.01968398,  0.01379884]])
 
-correct_ratio = array([[0.78637631, 0.86309699, 0.98560815],
+correct_ratio = array([[0.7652519052760128, 0.8536888729600138, 0.98560815],
        [0.97673189, 1.01999364, 1.09682727],
        [1.0377963 , 1.08292562, 1.15041094],
        [1.08185203, 1.14821166, 1.24154902],
@@ -59,7 +59,7 @@ def smooth_map (r, mnu=imnu, zidx=izidx):
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
                       for i in range(len(thetaG_arr))])
-    return hist_arr, std(imap_smooth)
+    return hist_arr, std(imap_smooth,axis=1)
     
 pool=MPIPool()
 if not pool.is_master():
