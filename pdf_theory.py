@@ -73,6 +73,7 @@ out_all = array(pool.map(smooth_map, range(1,10001)))
 out = array([out_all[i,0] for i in range(len(out_all))])
 out_std = array([out_all[i,1] for i in range(len(out_all))])
 for j in range(len(thetaG_arr)):
+    print out.shape
     save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arcmin[j]), out[:,j,:])
 save(out_dir+'PDFs_Mnu0.%i_z%.1f.npy'%(imnu, z_arr[izidx]), out_std)
 
