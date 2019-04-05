@@ -59,7 +59,8 @@ def smooth_map (r, mnu=imnu, zidx=izidx):
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
                       for i in range(len(thetaG_arr))])
-    return hist_arr, std(imap_smooth,axis=1)
+    std_arr = array([std(imap) for imap in imap_smooth])
+    return hist_arr, std_arr
     
 pool=MPIPool()
 if not pool.is_master():
