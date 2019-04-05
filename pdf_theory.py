@@ -66,7 +66,7 @@ binedges = array([map(binedges_fun,isigmakappa_arr) for isigmakappa_arr in sigma
 def std_map (r, mnu=imnu, zidx=izidx):
     imap = mapgen(z_arr[zidx], r, mnu)
     imap_smooth = array([smooth(imap, thetaG) for thetaG in thetaG_arr])
-    std_arr = std(imap_smooth,axis=1)
+    std_arr = [std(imap) for imap in imap_smooth]
     return std_arr
 
 pool=MPIPool()
@@ -80,6 +80,7 @@ out_std = array(pool.map(std_map, range(1,10001)))
 #for j in range(len(thetaG_arr)):
     #print out.shape
     #save(out_dir+'PDFs_Mnu0.%i_z%.1f_smooth%02d.npy'%(imnu, z_arr[izidx], thetaG_arcmin[j]), out[:,j,:])
+print out_std.shape
 save(out_dir+'PDFs_Mnu0.%i_z%.1f.npy'%(imnu, z_arr[izidx]), out_std)
 
 pool.close()
