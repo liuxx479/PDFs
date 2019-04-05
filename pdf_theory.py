@@ -60,6 +60,7 @@ def smooth_map (r, mnu=imnu, zidx=izidx):
     hist_arr = array([histogram(imap_smooth[i], bins=binedges[zidx, i])[0] 
                       for i in range(len(thetaG_arr))])
     std_arr = array([std(imap) for imap in imap_smooth])
+    print hist_arr.shape, std_arr.shape
     return hist_arr, std_arr
     
 pool=MPIPool()
